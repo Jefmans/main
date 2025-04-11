@@ -15,7 +15,9 @@ services:
   backend:
     build:
         context: "https://github.com/Jefmans/backend.git"
-        dockerfile: Dockerfile  # only if Dockerfile is in a subf>    command: gunicorn app.main:app -w 4 -k uvicorn.workers.Uvicor>    labels:
+        dockerfile: Dockerfile  # only if Dockerfile is in a subf>    
+    command: gunicorn app.main:app -w 4 -k uvicorn.workers.Uvicor>    
+    labels: 
       - "traefik.http.routers.backend.rule=PathPrefix(/api)"
     env_file:
       - .env
