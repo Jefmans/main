@@ -78,3 +78,6 @@ services:
 volumes:
   pgdata:
   portainer_data:
+
+networks:
+  agent_network:
