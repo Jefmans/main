@@ -1,4 +1,19 @@
+
 services:
+  vault:
+    image: hashicorp/vault:1.15.3
+    container_name: vault
+    ports:
+      - "8200:8200"
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: root
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+    volumes:
+      - vault_data:/vault
+    restart: always
+
   traefik:
     image: traefik:v2.10
     command:
@@ -19,9 +34,13 @@ services:
     command: gunicorn app.main:app -w 4 -k uvicorn.workers.Uvicor>    
     labels: 
       - "traefik.http.routers.backend.rule=PathPrefix(/api)"
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
+    environment:
+      - VAULT_ADDR: http://vault:8200
+      - VAULT_TOKEN: root
     depends_on:
+      - vault
       - postgres
       - elasticsearch
     restart: always
@@ -33,10 +52,17 @@ services:
 #      - "traefik.http.routers.frontend.rule=PathPrefix(/)"
 #    restart: always
 
+  # postgres:
+  #   image: postgres:15
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+  #   restart: always
   postgres:
     image: postgres:15
-    env_file:
-      - .env
+    environment:
+      POSTGRES_DB: mydb
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: always
@@ -78,6 +104,7 @@ services:
 volumes:
   pgdata:
   portainer_data:
+  vault_data:
 
 networks:
   agent_network:
