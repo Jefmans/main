@@ -1,0 +1,78 @@
+services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080" # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+
+  backend:
+    build:
+        context: "https://github.com/Jefmans/backend.git"
+        dockerfile: Dockerfile  # only if Dockerfile is in a subf>    command: gunicorn app.main:app -w 4 -k uvicorn.workers.Uvicor>    labels:
+      - "traefik.http.routers.backend.rule=PathPrefix(/api)"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - elasticsearch
+    restart: always
+
+#  frontend:
+#    build: ./frontend
+#    command: reflex run --port 3000 --frontend-only
+#    labels:
+#      - "traefik.http.routers.frontend.rule=PathPrefix(/)"
+#    restart: always
+
+  postgres:
+    image: postgres:15
+    env_file:
+      - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    restart: always
+
+  # portainer:
+  #   image: portainer/portainer-ce:latest
+  #   command: -H unix:///var/run/docker.sock
+  #   ports:
+  #     - "9000:9000"
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - portainer_data:/data
+  #   restart: always
+
+
+portainer_agent:
+  image: portainer/agent:latest
+  environment:
+    AGENT_CLUSTER_ADDR: tasks.portainer_agent
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - /var/lib/docker/volumes:/var/lib/docker/volumes
+  networks:
+    - agent_network
+  deploy:
+    mode: global
+  restart: always
+
+
+volumes:
+  pgdata:
+  portainer_data:
