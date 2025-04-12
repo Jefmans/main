@@ -103,16 +103,16 @@ services:
     restart: always
 
 
-pgadmin:
-  image: dpage/pgadmin4
-  ports:
-    - "8081:80"  # You can access it via http://localhost:8081
-  environment:
-    PGADMIN_DEFAULT_EMAIL: admin@localhost.com
-    PGADMIN_DEFAULT_PASSWORD: supersecure
-  volumes:
-    - pgadmin_data:/var/lib/pgadmin
-  restart: always
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "8081:80"  # You can access it via http://localhost:8081
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@localhost.com
+      PGADMIN_DEFAULT_PASSWORD: supersecure
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    restart: always
 
 
 volumes:
