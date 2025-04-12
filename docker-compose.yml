@@ -89,6 +89,8 @@ services:
 
   portainer_agent:
     image: portainer/agent:latest
+    ports:
+      - "9001:9001"
     environment:
       AGENT_CLUSTER_ADDR: tasks.portainer_agent
     volumes:
