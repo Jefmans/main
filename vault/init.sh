@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "[vault-init] Waiting for Vault to be ready..."
-apt-get update && apt-get install -y curl
+# apt-get update && apt-get install -y curl
 
 
 until curl -s http://vault:8200/v1/sys/health | grep -q '"initialized":true'; do
@@ -10,7 +10,8 @@ done
 
 echo "[vault-init] Vault is ready. Writing secrets..."
 
-vault login root
+# vault login root
+export VAULT_TOKEN=root
 
 vault kv put secret/backend POSTGRES_USER=myuser POSTGRES_PASSWORD=mysecretpassword
 
