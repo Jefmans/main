@@ -18,13 +18,14 @@ services:
     image: hashicorp/vault:1.15.3
     depends_on:
       - vault
-    entrypoint: ["/bin/sh", "-c", "/vault/init.sh"]
+    # entrypoint: ["/bin/sh", "-c", "/vault/init.sh"]
+    entrypoint: ["/bin/sh", "-c", "chmod +x /vault/init.sh && /vault/init.sh"]
     volumes:
       - ./vault/init.sh:/vault/init.sh
     environment:
       VAULT_ADDR: http://vault:8200
     restart: "no"
-    
+
 
   traefik:
     image: traefik:v2.10
