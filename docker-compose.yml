@@ -106,12 +106,16 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     ports:
-      - "8081:80"  # You can access it via http://localhost:8081
+      - "8081:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@localhost.com
       PGADMIN_DEFAULT_PASSWORD: supersecure
+      PGADMIN_CONFIG_SERVER_MODE: 'False'  # Needed to enable preload
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json
+    depends_on:
+      - postgres
     restart: always
 
 
