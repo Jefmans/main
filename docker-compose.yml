@@ -119,7 +119,7 @@ services:
       context: https://github.com/Jefmans/airbnb_frontend.git
       dockerfile: Dockerfile  # optional, only if it's in a custom path
     # command: reflex run --frontend-only --port 3000
-    command: reflex run --env production --port 3000 --backend disabled
+    # command: reflex run --env production --port 3000 --backend disabled
     ports:
       - "3000:3000"
     labels:
