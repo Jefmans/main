@@ -123,7 +123,7 @@ services:
     ports:
       - "3000:3000"
     labels:
-      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/test/`)"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
     depends_on:
       - backend
