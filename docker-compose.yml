@@ -59,14 +59,6 @@ services:
       - elasticsearch
     restart: always
 
-#  frontend:
-#    build: ./frontend
-#    command: reflex run --port 3000 --frontend-only
-#    labels:
-#      - "traefik.http.routers.frontend.rule=PathPrefix(/)"
-#    restart: always
-
-
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
@@ -76,16 +68,6 @@ services:
     ports:
       - "9200:9200"
     restart: always
-
-  # portainer:
-  #   image: portainer/portainer-ce:latest
-  #   command: -H unix:///var/run/docker.sock
-  #   ports:
-  #     - "9000:9000"
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - portainer_data:/data
-  #   restart: always
 
 
   portainer_agent:
@@ -130,6 +112,17 @@ services:
       - ./pgadmin/servers.json:/pgadmin4/servers.json
     depends_on:
       - postgres
+    restart: always
+
+  frontend:
+    build:
+      context: https://github.com/Jefmans/airbnb_frontend.git
+      dockerfile: Dockerfile  # optional, only if it's in a custom path
+    command: reflex run --frontend-only --port 3000
+    labels:
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+    depends_on:
+      - backend
     restart: always
 
 
