@@ -119,6 +119,8 @@ services:
       context: https://github.com/Jefmans/airbnb_frontend.git
       dockerfile: Dockerfile  # optional, only if it's in a custom path
     command: reflex run --frontend-only --port 3000
+    ports:
+      - "3000:3000"
     labels:
       - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
