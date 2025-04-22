@@ -54,9 +54,10 @@ services:
         context: "https://github.com/Jefmans/backend.git"
         dockerfile: Dockerfile  # only if Dockerfile is in a subf>    
     command: gunicorn app.main:app -w 4 -k uvicorn.workers.Uvicor>    
-    labels: 
+    labels:
+      - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=PathPrefix(`/api`, `/_event`)"
-      - "traefik.enable=false"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
     # env_file:
     #   - .env
     environment:
