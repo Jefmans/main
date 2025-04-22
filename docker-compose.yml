@@ -40,6 +40,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
+    networks:
+      - default
 
   backend:
     build:
@@ -48,6 +50,8 @@ services:
     command: gunicorn app.main:app -w 4 -k uvicorn.workers.Uvicor>    
     labels: 
       - "traefik.http.routers.backend.rule=PathPrefix(/api)"
+
+      - "traefik.enable=false"
     # env_file:
     #   - .env
     environment:
@@ -58,6 +62,8 @@ services:
       - postgres
       - elasticsearch
     restart: always
+    networks:
+      - internal_backend
 
 
   elasticsearch:
@@ -68,6 +74,8 @@ services:
     ports:
       - "9200:9200"
     restart: always
+    networks:
+      - internal_backend
 
 
   portainer_agent:
@@ -96,6 +104,8 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: always
+    networks:
+      - internal_backend
 
 
 
@@ -130,6 +140,9 @@ services:
     depends_on:
       - backend
     restart: always
+    networks:
+      - default
+      - internal_backend
 
 
 volumes:
@@ -141,3 +154,6 @@ volumes:
 
 networks:
   agent_network:
+  default:
+  internal_backend:
+    internal: true
