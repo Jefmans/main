@@ -15,6 +15,7 @@ services:
     restart: always
     networks:
       - internal_backend
+      - only_dev
 
   vault_init: 
     image: alpine:3.18
@@ -30,6 +31,7 @@ services:
     restart: "no"
     networks:
       - internal_backend
+      
 
 
   traefik:
@@ -167,3 +169,4 @@ networks:
   default:
   internal_backend:
     internal: true
+  only_dev:
