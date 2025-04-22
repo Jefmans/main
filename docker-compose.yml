@@ -120,13 +120,13 @@ services:
       dockerfile: Dockerfile  # optional, only if it's in a custom path
     # command: reflex run --frontend-only --port 3000
     # command: reflex run --env production --port 3000 --backend disabled
-    environment:
-      REFLEX_HOST: 0.0.0.0
-    ports:
-      - "3000:3000"
+    # environment:
+    #   REFLEX_HOST: 0.0.0.0
+    # ports:
+    #   - "3000:3000"
     labels:
       - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
-      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
     depends_on:
       - backend
     restart: always
