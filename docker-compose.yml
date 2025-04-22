@@ -82,6 +82,7 @@ services:
     restart: always
     networks:
       - internal_backend
+      - only_dev
 
 
   portainer_agent:
