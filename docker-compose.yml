@@ -146,7 +146,8 @@ services:
     # command: reflex run --frontend-only --port 3000
     # command: reflex run --env production --port 3000 --backend disabled
     environment:
-      WEBSOCKET_URL: ws://65.109.170.93/_event # or your public domain here
+      ES_HOST: http://elasticsearch:9200
+      # WEBSOCKET_URL: ws://65.109.170.93/_event # or your public domain here
     #   REFLEX_HOST: 0.0.0.0
     # ports:
     #   - "3000:3000"
