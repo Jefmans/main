@@ -142,7 +142,8 @@ services:
       dockerfile: Dockerfile  # optional, only if it's in a custom path
     # command: reflex run --frontend-only --port 3000
     # command: reflex run --env production --port 3000 --backend disabled
-    # environment:
+    environment:
+      WEBSOCKET_URL: ws://localhost/_event  # or your public domain here
     #   REFLEX_HOST: 0.0.0.0
     # ports:
     #   - "3000:3000"
