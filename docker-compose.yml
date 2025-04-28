@@ -43,6 +43,11 @@ services:
     ports:
       - "80:80"
       - "8080:8080" # Traefik dashboard
+    
+    entryPoints:
+      web:
+        address: ":80"
+
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
@@ -139,31 +144,61 @@ services:
       - default
       - internal_backend    
 
-  frontend:
-    build:
-      context: https://github.com/Jefmans/airbnb_frontend.git
-      dockerfile: Dockerfile  # optional, only if it's in a custom path
-    # command: reflex run --frontend-only --port 3000
-    # command: reflex run --env production --port 3000 --backend disabled
-    environment:
-      ES_HOST: http://elasticsearch:9200
-      # WEBSOCKET_URL: ws://65.109.170.93/_event # or your public domain here
-    #   REFLEX_HOST: 0.0.0.0
-    # ports:
-    #   - "3000:3000"
+  # frontend:
+  #   build:
+  #     context: https://github.com/Jefmans/airbnb_frontend.git
+  #     dockerfile: Dockerfile  # optional, only if it's in a custom path
+  #   # command: reflex run --frontend-only --port 3000
+  #   # command: reflex run --env production --port 3000 --backend disabled
+  #   environment:
+  #     ES_HOST: http://elasticsearch:9200
+  #     # WEBSOCKET_URL: ws://65.109.170.93/_event # or your public domain here
+  #   #   REFLEX_HOST: 0.0.0.0
+  #   # ports:
+  #   #   - "3000:3000"
 
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+  #     - "traefik.http.routers.frontend.entrypoints=web"
+  #     - "traefik.http.services.frontend.loadbalancer.server.port=80"
+
+  #   depends_on:
+  #     - backend
+  #   restart: always
+  #   networks:
+  #     - default
+  #     - internal_backend
+
+
+
+  reflex-backend:
+    build:
+      context: https://github.com/Jefmans/reflex.git
+      dockerfile: backend.Dockerfile
+    networks:
+      - internal
+    depends_on:
+      - postgres
+    restart: always
+
+  reflex-frontend:
+    build:
+      context: https://github.com/Jefmans/reflex.git
+      dockerfile: frontend.Dockerfile
+    networks:
+      - internal
+      - traefik-public
+    depends_on:
+      - reflex-backend
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
-      - "traefik.http.routers.frontend.entrypoints=web"
-      - "traefik.http.services.frontend.loadbalancer.server.port=80"
-
-    depends_on:
-      - backend
+      - "traefik.http.routers.reflex.rule=Host(`65.109.170.93`)"
+      - "traefik.http.routers.reflex.entrypoints=web"
+      - "traefik.http.services.reflex.loadbalancer.server.port=80"
+      - "traefik.docker.network=traefik-public"
     restart: always
-    networks:
-      - default
-      - internal_backend
+
 
 
 volumes:
