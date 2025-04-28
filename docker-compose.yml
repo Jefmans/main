@@ -17,7 +17,7 @@ services:
       - internal_backend
       - only_dev
 
-  vault_init:
+  vault_init: 
     build:
       context: ./vault
       dockerfile: vault_init.Dockerfile
@@ -28,6 +28,7 @@ services:
     restart: "no"
     networks:
       - internal_backend
+
 
 
   traefik:
