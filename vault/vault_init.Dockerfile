@@ -4,15 +4,14 @@ WORKDIR /vault
 
 RUN apk add --no-cache curl
 
-# Debug info
-RUN echo "Before copying:" && pwd && ls -la
+RUN echo "Before copying:"
+RUN ls -la /vault
 
 COPY init.sh .
 
-# Debug info
-RUN echo "After copying init.sh:" && pwd && ls -la
+RUN echo "After copying init.sh:"
+RUN ls -la /vault
 
-# Make script executable (correct path!)
 RUN chmod +x init.sh
 
 ENTRYPOINT ["./init.sh"]
