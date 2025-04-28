@@ -4,8 +4,8 @@ WORKDIR /vault
 
 RUN apk add --no-cache curl
 
-COPY init.sh ./init.sh
+COPY init.sh .
 
-RUN chmod +x ./init.sh
+RUN chmod +x init.sh
 
 ENTRYPOINT ["./init.sh"]
