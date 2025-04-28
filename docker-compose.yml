@@ -1,3 +1,4 @@
+version: "3.9"
 
 services:
   vault:
@@ -17,12 +18,10 @@ services:
       - internal_backend
       - only_dev
 
-  vault_init: 
+  vault_init:
     image: alpine:3.18
     depends_on:
       - vault
-    # entrypoint: ["/bin/sh", "-c", "/vault/init.sh"]
-    # entrypoint: ["/bin/sh", "-c", "chmod +x /vault/init.sh && /vault/init.sh"]
     entrypoint: /bin/sh -c "apk add --no-cache curl && chmod +x /vault/init.sh && /vault/init.sh"
     volumes:
       - ./vault/init.sh:/vault/init.sh
@@ -31,8 +30,6 @@ services:
     restart: "no"
     networks:
       - internal_backend
-      
-
 
   traefik:
     image: traefik:v2.10
@@ -42,75 +39,13 @@ services:
       - "--entrypoints.web.address=:80"
     ports:
       - "80:80"
-      - "8080:8080" # Traefik dashboard
-    
-    # entryPoints:
-    #   web:
-    #     address: ":80"
-
+      - "8080:8080"  # Traefik dashboard
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
     networks:
+      - traefik_public
       - default
-
-  backend:
-    build:
-        context: "https://github.com/Jefmans/backend.git"
-        dockerfile: Dockerfile  # only if Dockerfile is in a subf>    
-    command: gunicorn app.main:app -w 4 -k uvicorn.workers.Uvicor>    
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=PathPrefix(`/api`, `/_event`)"
-      - "traefik.http.routers.backend.entrypoints=web"
-      - "traefik.http.services.backend.loadbalancer.server.port=8000"
-
-    # env_file:
-    #   - .env
-    environment:
-      VAULT_ADDR: http://vault:8200
-      VAULT_TOKEN: root
-    depends_on:
-      - vault
-      - postgres
-      - elasticsearch
-    restart: always
-    networks:
-      - internal_backend
-      - default
-
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.0
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-    ports:
-      - "9200:9200"
-    restart: always
-    networks:
-      - internal_backend
-      - only_dev
-
-
-  portainer_agent:
-    image: portainer/agent:latest
-    ports:
-      - "9001:9001"
-    environment:
-      AGENT_CLUSTER_ADDR: tasks.portainer_agent
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/docker/volumes:/var/lib/docker/volumes      
-    deploy:
-      mode: global
-    restart: always
-    networks:
-      - agent_network
-      - default
-      - internal_backend    
-
-
 
   postgres:
     image: postgres:15
@@ -124,8 +59,6 @@ services:
     networks:
       - internal_backend
 
-
-
   pgadmin:
     image: dpage/pgadmin4
     ports:
@@ -133,7 +66,7 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@localhost.com
       PGADMIN_DEFAULT_PASSWORD: supersecure
-      PGADMIN_CONFIG_SERVER_MODE: 'True'  # Needed to enable preload
+      PGADMIN_CONFIG_SERVER_MODE: 'True'
     volumes:
       - pgadmin_data:/var/lib/pgadmin
       - ./pgadmin/servers.json:/pgadmin4/servers.json
@@ -141,54 +74,71 @@ services:
       - postgres
     restart: always
     networks:
+      - internal_backend
       - default
-      - internal_backend    
 
-  # frontend:
-  #   build:
-  #     context: https://github.com/Jefmans/airbnb_frontend.git
-  #     dockerfile: Dockerfile  # optional, only if it's in a custom path
-  #   # command: reflex run --frontend-only --port 3000
-  #   # command: reflex run --env production --port 3000 --backend disabled
-  #   environment:
-  #     ES_HOST: http://elasticsearch:9200
-  #     # WEBSOCKET_URL: ws://65.109.170.93/_event # or your public domain here
-  #   #   REFLEX_HOST: 0.0.0.0
-  #   # ports:
-  #   #   - "3000:3000"
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    restart: always
+    networks:
+      - internal_backend
+      - only_dev
 
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
-  #     - "traefik.http.routers.frontend.entrypoints=web"
-  #     - "traefik.http.services.frontend.loadbalancer.server.port=80"
+  portainer_agent:
+    image: portainer/agent:latest
+    ports:
+      - "9001:9001"
+    environment:
+      AGENT_CLUSTER_ADDR: tasks.portainer_agent
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+    deploy:
+      mode: global
+    restart: always
+    networks:
+      - agent_network
+      - default
 
-  #   depends_on:
-  #     - backend
-  #   restart: always
-  #   networks:
-  #     - default
-  #     - internal_backend
-
-
+  backend:
+    build:
+      context: https://github.com/Jefmans/backend.git
+      dockerfile: Dockerfile
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=PathPrefix(`/api`, `/_event`, `/_upload`, `/ping`)"
+      - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: root
+    depends_on:
+      - postgres
+      - vault
+    restart: always
+    networks:
+      - internal_backend
+      - traefik_public
 
   reflex-backend:
     build:
       context: https://github.com/Jefmans/reflex.git
       dockerfile: backend.Dockerfile
-    networks:
-      - internal_backend
     depends_on:
       - postgres
+    networks:
+      - internal_backend
     restart: always
 
   reflex-frontend:
     build:
       context: https://github.com/Jefmans/reflex.git
       dockerfile: frontend.Dockerfile
-    networks:
-      - internal_backend
-      - traefik_public
     depends_on:
       - reflex-backend
     labels:
@@ -196,21 +146,19 @@ services:
       - "traefik.http.routers.reflex.rule=Host(`65.109.170.93`)"
       - "traefik.http.routers.reflex.entrypoints=web"
       - "traefik.http.services.reflex.loadbalancer.server.port=80"
-      - "traefik.docker.network=traefik-public"
+      - "traefik.docker.network=traefik_public"
+    networks:
+      - traefik_public
+      - internal_backend
     restart: always
-
-
 
 volumes:
   pgdata:
-  portainer_data:
   vault_data:
   pgadmin_data:
 
-
 networks:
   agent_network:
-  default:
   internal_backend:
     internal: true
   only_dev:
