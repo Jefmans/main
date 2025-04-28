@@ -6,6 +6,6 @@ RUN apk add --no-cache curl
 
 COPY init.sh .
 
-RUN chmod +x init.sh
+RUN chmod +x vault/init.sh
 
 ENTRYPOINT ["./init.sh"]
