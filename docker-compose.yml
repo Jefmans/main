@@ -177,7 +177,7 @@ services:
       context: https://github.com/Jefmans/reflex.git
       dockerfile: backend.Dockerfile
     networks:
-      - internal
+      - internal_backend
     depends_on:
       - postgres
     restart: always
@@ -187,8 +187,8 @@ services:
       context: https://github.com/Jefmans/reflex.git
       dockerfile: frontend.Dockerfile
     networks:
-      - internal
-      - traefik-public
+      - internal_backend
+      - traefik_public
     depends_on:
       - reflex-backend
     labels:
@@ -214,3 +214,4 @@ networks:
   internal_backend:
     internal: true
   only_dev:
+  traefik_public:
