@@ -158,7 +158,7 @@ services:
   reflex_app:
     build:
       context: https://github.com/Jefmans/new_front.git
-      dockerfile: new_front.Dockerfile
+      dockerfile: Dockerfile
     container_name: reflex_app
     environment:
       - API_URL=http://65.109.170.93:8000  # Update with your IP address
