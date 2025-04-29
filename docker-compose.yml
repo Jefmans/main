@@ -154,7 +154,7 @@ services:
   #     - internal_backend
   #   restart: always
 
-services:
+
   reflex_app:
     build:
       context: https://github.com/Jefmans/new_front.git
