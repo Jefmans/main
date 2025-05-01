@@ -155,25 +155,37 @@ services:
   #   restart: always
 
 
-  reflex_app:
-    build:
-      context: https://github.com/Jefmans/new_front.git
-      dockerfile: Dockerfile
-    container_name: reflex_app
-    environment:
-      - API_URL=http://65.109.170.93:8000  # Update with your IP address
-    expose:
-      - "3000"
-      - "8000"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.reflex_front.rule=Host(`65.109.170.93`)"  # Use the IP here
-      - "traefik.http.routers.reflex_front.entrypoints=websecure"
-      - "traefik.http.services.reflex_front.loadbalancer.server.port=3000"
-      - "traefik.http.routers.reflex_back.rule=Host(`65.109.170.93`) && (PathPrefix(`/_event`) || PathPrefix(`/_upload`) || PathPrefix(`/ping`))"
-      - "traefik.http.routers.reflex_back.entrypoints=websecure"
-      - "traefik.http.services.reflex_back.loadbalancer.server.port=8000"
+  # reflex_app:
+  #   build:
+  #     context: https://github.com/Jefmans/new_front.git
+  #     dockerfile: Dockerfile
+  #   container_name: reflex_app
+  #   environment:
+  #     - API_URL=http://65.109.170.93:8000  # Update with your IP address
+  #   expose:
+  #     - "3000"
+  #     - "8000"
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.reflex_front.rule=Host(`65.109.170.93`)"  # Use the IP here
+  #     - "traefik.http.routers.reflex_front.entrypoints=websecure"
+  #     - "traefik.http.services.reflex_front.loadbalancer.server.port=3000"
+  #     - "traefik.http.routers.reflex_back.rule=Host(`65.109.170.93`) && (PathPrefix(`/_event`) || PathPrefix(`/_upload`) || PathPrefix(`/ping`))"
+  #     - "traefik.http.routers.reflex_back.entrypoints=websecure"
+  #     - "traefik.http.services.reflex_back.loadbalancer.server.port=8000"
 
+
+
+  angular-app:
+    build:
+      context: https://github.com/Jefmans/my-angular-app.git
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./src:/app/src
+      - /app/node_modules
+    command: ["npm", "start"]  # This will use the Angular development server for hot reloading
 
 
 volumes:
