@@ -176,16 +176,17 @@ services:
 
 
 
+
   angular-app:
     build:
       context: https://github.com/Jefmans/my-angular-app.git
       dockerfile: Dockerfile
     ports:
-      - "4200:4200"
-    volumes:
-      - ./src:/app/src
-      - /app/node_modules
-    command: ["npm", "start"]  # This will use the Angular development server for hot reloading
+      - "80:80"
+    networks:
+      - app-network
+
+
 
 
 volumes:
@@ -199,3 +200,5 @@ networks:
     internal: true
   only_dev:
   traefik_public:
+  app-network:
+    driver: bridge
