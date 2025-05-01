@@ -181,7 +181,7 @@ services:
 
   angular-app:
     build:
-      context: .
+      context: https://github.com/Jefmans/my-angular-app.git
       dockerfile: Dockerfile
     ports:
       - "8080"  # This is used for internal communication between containers, Traefik routes to this
