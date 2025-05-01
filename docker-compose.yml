@@ -38,14 +38,16 @@ services:
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
     ports:
-      - "8000:80"
-      - "8080:8080"  # Traefik dashboard
+      - "80:80"  # HTTP port
+      - "443:443"  # HTTPS port (if you're using SSL)
+      - "8080:8080"  # Traefik dashboard (optional)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
     networks:
       - traefik_public
       - default
+      - app-network
 
   postgres:
     image: postgres:15
@@ -179,10 +181,14 @@ services:
 
   angular-app:
     build:
-      context: https://github.com/Jefmans/my-angular-app.git
+      context: .
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "8080"  # This is used for internal communication between containers, Traefik routes to this
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.angular-app.rule=Host(`your-domain.com`)"  # Replace with your domain
+      - "traefik.http.services.angular-app.loadbalancer.server.port=80"  # Nginx serves on port 80
     networks:
       - app-network
 
@@ -201,4 +207,4 @@ networks:
   only_dev:
   traefik_public:
   app-network:
-    driver: bridge
+    external: true 
