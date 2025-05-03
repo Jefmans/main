@@ -47,7 +47,7 @@ services:
     networks:
       - traefik_public
       - default
-      - app-network
+      - app_network
 
   postgres:
     image: postgres:15
@@ -129,55 +129,6 @@ services:
       - internal_backend
       - traefik_public
 
-  # reflex-backend:
-  #   build:
-  #     context: https://github.com/Jefmans/reflex.git
-  #     dockerfile: backend.Dockerfile
-  #   depends_on:
-  #     - postgres
-  #   networks:
-  #     - internal_backend
-  #   restart: always
-
-  # reflex-frontend:
-  #   build:
-  #     context: https://github.com/Jefmans/reflex.git
-  #     dockerfile: frontend.Dockerfile
-  #   depends_on:
-  #     - reflex-backend
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.reflex.rule=Host(`65.109.170.93`)"
-  #     - "traefik.http.routers.reflex.entrypoints=web"
-  #     - "traefik.http.services.reflex.loadbalancer.server.port=80"
-  #     - "traefik.docker.network=traefik_public"
-  #   networks:
-  #     - traefik_public
-  #     - internal_backend
-  #   restart: always
-
-
-  # reflex_app:
-  #   build:
-  #     context: https://github.com/Jefmans/new_front.git
-  #     dockerfile: Dockerfile
-  #   container_name: reflex_app
-  #   environment:
-  #     - API_URL=http://65.109.170.93:8000  # Update with your IP address
-  #   expose:
-  #     - "3000"
-  #     - "8000"
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.reflex_front.rule=Host(`65.109.170.93`)"  # Use the IP here
-  #     - "traefik.http.routers.reflex_front.entrypoints=websecure"
-  #     - "traefik.http.services.reflex_front.loadbalancer.server.port=3000"
-  #     - "traefik.http.routers.reflex_back.rule=Host(`65.109.170.93`) && (PathPrefix(`/_event`) || PathPrefix(`/_upload`) || PathPrefix(`/ping`))"
-  #     - "traefik.http.routers.reflex_back.entrypoints=websecure"
-  #     - "traefik.http.services.reflex_back.loadbalancer.server.port=8000"
-
-
-
 
   angular-app:
     build:
@@ -191,7 +142,7 @@ services:
       - "traefik.http.routers.angular-app.rule=Host(`65.109.170.93`)"  # Use your IP address here
       - "traefik.http.services.angular-app.loadbalancer.server.port=80"  # Nginx serves on port 80
     networks:
-      - app-network
+      - app_network
 
 
 
@@ -207,5 +158,5 @@ networks:
     internal: true
   only_dev:
   traefik_public:
-  app-network:
+  app_network:
     external: true 
