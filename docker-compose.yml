@@ -140,7 +140,7 @@ services:
       - "traefik.enable=true"
       # - "traefik.http.routers.angular-app.rule=Host(`your-domain.com`)"  # Replace with your domain
       - "traefik.http.routers.angular-app.rule=Host(`65.109.170.93`)"  # Use your IP address here
-      - "traefik.http.services.angular-app.loadbalancer.server.port=80"  # Nginx serves on port 80
+      - "traefik.http.services.angular-app.loadbalancer.server.port=8080"  # Nginx serves on port 80
     networks:
       - app_network
 
