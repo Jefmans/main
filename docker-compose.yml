@@ -159,4 +159,3 @@ networks:
   only_dev:
   traefik_public:
   app_network:
-    external: true 
