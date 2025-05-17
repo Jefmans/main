@@ -118,6 +118,7 @@ services:
       - "traefik.http.routers.backend.rule=PathPrefix(`/api`, `/_event`, `/_upload`, `/ping`)"
       - "traefik.http.routers.backend.entrypoints=web"
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
+      - "traefik.http.middlewares.strip-api-prefix.stripprefix.prefixes=/api"  # Optional: strip /api prefix before passing to FastAPI
     environment:
       VAULT_ADDR: http://vault:8200
       VAULT_TOKEN: root
